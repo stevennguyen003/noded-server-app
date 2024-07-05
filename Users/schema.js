@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     role: {
         type: String,
@@ -11,6 +13,6 @@ const userSchema = new mongoose.Schema({
         default: "USER",
     },
     // profilePicture: String,
-  },
-  { collection: "users" });
+},
+    { collection: "users" });
 export default userSchema;
