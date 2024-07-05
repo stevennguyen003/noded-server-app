@@ -69,6 +69,16 @@ export default function UserRoutes(app) {
         res.sendStatus(200);
     };
 
+    // Grab the profile info of the current user
+    const profile = async (req, res) => {
+        const currentUser = req.session["currentUser"];
+        if (!currentUser) {
+            res.sendStatus(401);
+            return;
+        }
+        res.json(currentUser);
+    };
+
     app.post("/api/users", createUser);
     app.get("/api/users", findAllUsers);
     app.get("/api/users/:userId", findUserById);
@@ -77,4 +87,5 @@ export default function UserRoutes(app) {
     app.post("/api/users/signup", signup);
     app.post("/api/users/signin", signin);
     app.post("/api/users/signout", signout);
+    app.post("/api/users/profile", profile);
 }
