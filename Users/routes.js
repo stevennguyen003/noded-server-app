@@ -1,4 +1,32 @@
 import * as dao from "./dao.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadsDir = "uploads/";
+        fs.mkdir(uploadsDir, { recursive: true }, (err) => {
+            if (err) {
+                console.error("Failed to create directory:", err);
+                cb(err, uploadsDir);
+            } else {
+                console.log("Uploads directory ensured:", uploadsDir);
+                cb(null, uploadsDir);
+            }
+        });
+    },
+    filename: function (req, file, cb) {
+        cb(
+            null,
+            `${req.params.userId}-${Date.now()}${path.extname(file.originalname)}`
+        );
+    },
+});
+
+const upload = multer({ storage: storage });
+
 
 // RESTful APIs
 export default function UserRoutes(app) {
@@ -84,6 +112,20 @@ export default function UserRoutes(app) {
         res.json(currentUser);
     };
 
+    // Upload a profile picture for the user
+    const uploadProfilePicture = async (req, res) => {
+        if (!req.file) {
+            return res.status(400).send("No file uploaded.");
+        }
+        // Optionally update the user record to reflect the new profile picture path
+        dao
+            .uploadProfilePicture(req.params.userId, req.file.path)
+            .then(() => res.send(`File uploaded successfully: ${req.file.path}`))
+            .catch((err) =>
+                res.status(500).send("Failed to update user with new profile picture.")
+            );
+    };
+
     app.post("/api/users", createUser);
     app.get("/api/users", findAllUsers);
     app.get("/api/users/:userId", findUserById);
@@ -93,4 +135,9 @@ export default function UserRoutes(app) {
     app.post("/api/users/signin", signin);
     app.post("/api/users/signout", signout);
     app.post("/api/users/profile", profile);
+    app.post(
+        "/api/users/:userId/uploadProfilePicture",
+        upload.single("profilePicture"),
+        uploadProfilePicture
+    );
 }
