@@ -25,6 +25,7 @@ const storage = multer.diskStorage({
     },
 });
 
+
 const upload = multer({ storage: storage });
 
 
@@ -109,7 +110,11 @@ export default function UserRoutes(app) {
             res.sendStatus(401);
             return;
         }
-        res.json(currentUser);
+        // Fetch the latest user data from the database
+        const updatedUser = await dao.findUserById(currentUser._id);
+        // Update the session with the latest data
+        req.session["currentUser"] = updatedUser;
+        res.json(updatedUser);
     };
 
     // Upload a profile picture for the user
@@ -117,13 +122,16 @@ export default function UserRoutes(app) {
         if (!req.file) {
             return res.status(400).send("No file uploaded.");
         }
-        // Optionally update the user record to reflect the new profile picture path
-        dao
-            .uploadProfilePicture(req.params.userId, req.file.path)
-            .then(() => res.send(`File uploaded successfully: ${req.file.path}`))
-            .catch((err) =>
-                res.status(500).send("Failed to update user with new profile picture.")
-            );
+        try {
+            await dao.uploadProfilePicture(req.params.userId, req.file.path);
+            // Update the session with the new profile picture
+            if (req.session.currentUser) {
+                req.session.currentUser.profilePicture = req.file.path;
+            }
+            res.send(`File uploaded successfully: ${req.file.path}`);
+        } catch (err) {
+            res.status(500).send("Failed to update user with new profile picture.");
+        }
     };
 
     app.post("/api/users", createUser);
