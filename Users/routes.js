@@ -2,7 +2,6 @@ import * as dao from "./dao.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -63,7 +62,7 @@ export default function UserRoutes(app) {
     const updateUser = async (req, res) => {
         const { userId } = req.params;
         const status = await dao.updateUser(userId, req.body);
-        currentUser = await dao.findUserById(userId);
+        const currentUser = await dao.findUserById(userId);
         res.json(status);
     };
 
