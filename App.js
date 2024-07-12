@@ -7,6 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import Hello from "./Hello.js";
 import UserRoutes from "./Users/routes.js";
+import GroupRoutes from "./Groups/routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +42,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(session(sessionOptions));
 app.use(express.json());
-
+GroupRoutes(app);
 UserRoutes(app);
 Hello(app);
 
