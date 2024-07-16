@@ -2,6 +2,7 @@ import * as dao from "./dao.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { ObjectId } from 'mongodb';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -52,9 +53,22 @@ export default function GroupRoutes(app) {
 
     // Find group by their unique id
     const findGroupById = async (req, res) => {
-        const user = await dao.findGroupById(req.params.groupId);
-        res.json(user);
+        try {
+            const { groupId } = req.params;
+            if (!ObjectId.isValid(groupId)) {
+                return res.status(400).json({ error: 'Invalid group ID' });
+            }
+            const group = await dao.findGroupById(new ObjectId(groupId));
+            if (!group) {
+                return res.status(404).json({ error: 'Group not found' });
+            }
+            res.json(group);
+        } catch (error) {
+            console.error('Error finding group:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
+
     // Update a group
     const updateGroup = async (req, res) => {
         const status = await dao.updateGroup(req.params.groupId, req.body);
