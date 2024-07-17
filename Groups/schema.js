@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import crypto from 'crypto';
 
 // Function to generate a random invite link
-function generateInviteLink() {
+function generateInviteCode() {
     return crypto.randomBytes(4).toString('hex');
 }
 
@@ -18,9 +18,9 @@ const groupSchema = new mongoose.Schema({
         }
     },
     profilePicture: String,
-    inviteLink: { 
+    inviteCode: { 
         type: String, 
-        default: generateInviteLink,
+        default: generateInviteCode,
         unique: true,
         required: true
     }
@@ -33,11 +33,11 @@ groupSchema.pre('save', async function(next) {
         const Group = mongoose.model('Group', groupSchema);
         let isUnique = false;
         while (!isUnique) {
-            const existingGroup = await Group.findOne({ inviteLink: this.inviteLink });
+            const existingGroup = await Group.findOne({ inviteCode: this.inviteCode });
             if (!existingGroup) {
                 isUnique = true;
             } else {
-                this.inviteLink = generateInviteLink();
+                this.inviteCode = generateInviteCode();
             }
         }
     }

@@ -5,6 +5,7 @@ export const createGroup = (group) => {
 }
 export const findAllGroups = () => model.find();
 export const findGroupById = (groupId) => model.findById(groupId);
+export const findGroupByInviteCode = (inviteCode) => model.findOne({ inviteCode: inviteCode });
 export const updateGroup = (groupId, group) => model.updateOne({ _id: groupId }, { $set: group });
 export const deleteGroup = (groupId) => model.deleteOne({ _id: groupId });
 export const uploadProfilePicture = (groupId, url) =>

@@ -69,10 +69,16 @@ export default function GroupRoutes(app) {
         }
     }
 
+    // Find group by their unique invite link
+    const findGroupByInviteCode = async (req, res) => {
+        const group = await dao.findGroupByInviteCode(req.params.inviteCode);
+        res.json(group);
+    }
+
     // Update a group
     const updateGroup = async (req, res) => {
         const status = await dao.updateGroup(req.params.groupId, req.body);
-        currentGroup = await dao.findGroupById(req.params.groupId);
+        const currentGroup = await dao.findGroupById(req.params.groupId);
         res.json(status);
     };
 
@@ -92,7 +98,8 @@ export default function GroupRoutes(app) {
 
     app.post("/api/groups", createGroup);
     app.get("/api/groups", findAllGroups);
-    app.get("/api/groups/:groupId", findGroupById);
+    app.get("/api/groups/id/:groupId", findGroupById);
+    app.get("/api/groups/invite/:inviteCode", findGroupByInviteCode);
     app.put("/api/groups/:groupId", updateGroup);
     app.delete("/api/groups/:groupId", deleteGroup);
     app.post(
