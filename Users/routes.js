@@ -5,13 +5,13 @@ import fs from "fs";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadsDir = "uploads/";
+        const uploadsDir = "images/";
         fs.mkdir(uploadsDir, { recursive: true }, (err) => {
             if (err) {
                 console.error("Failed to create directory:", err);
                 cb(err, uploadsDir);
             } else {
-                console.log("Uploads directory ensured:", uploadsDir);
+                console.log("Images directory ensured:", uploadsDir);
                 cb(null, uploadsDir);
             }
         });
@@ -73,7 +73,6 @@ export default function UserRoutes(app) {
             if (user) {
                 return res.status(400).json({ message: "Username already taken" });
             }
-
             const currentUser = await dao.createUser(req.body);
             req.session["currentUser"] = currentUser;
             res.json(currentUser);

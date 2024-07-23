@@ -17,15 +17,15 @@ const groupSchema = new mongoose.Schema({
             default: 'user'
         }
     },
-    profilePicture: String,
     inviteCode: { 
         type: String, 
         default: generateInviteCode,
         unique: true,
         required: true
-    }
-},
-{ collection: "groups" });
+    },
+    profilePicture: String,
+    noteIds: [{ type: String }]
+}, { collection: "groups" });
 
 // Middleware to ensure uniqueness of invite link
 groupSchema.pre('save', async function(next) {

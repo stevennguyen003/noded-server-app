@@ -38,7 +38,8 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 // Serve files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/notes', express.static(path.join(__dirname, 'notes')));
 
 app.use(session(sessionOptions));
 app.use(express.json());

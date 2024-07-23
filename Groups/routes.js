@@ -6,14 +6,14 @@ import { ObjectId } from 'mongodb';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadsDir = "uploads/";
-        fs.mkdir(uploadsDir, { recursive: true }, (err) => {
+        const notesDir = "noteUploads/";
+        fs.mkdir(notesDir, { recursive: true }, (err) => {
             if (err) {
                 console.error("Failed to create directory:", err);
-                cb(err, uploadsDir);
+                cb(err, notesDir);
             } else {
-                console.log("Uploads directory ensured:", uploadsDir);
-                cb(null, uploadsDir);
+                console.log("Notes directory ensured:", notesDir);
+                cb(null, notesDir);
             }
         });
     },
@@ -82,7 +82,7 @@ export default function GroupRoutes(app) {
         res.json(status);
     };
 
-    // Upload a profile picture for the user
+    // Upload a profile picture for the group
     const uploadProfilePicture = async (req, res) => {
         if (!req.file) {
             return res.status(400).send("No file uploaded.");
@@ -91,10 +91,30 @@ export default function GroupRoutes(app) {
             await dao.uploadProfilePicture(req.params.groupId, req.file.path);
             res.send(`File uploaded successfully: ${req.file.path}`);
         } catch (err) {
-            res.status(500).send("Failed to update user with new profile picture.");
+            res.status(500).send("Failed to update group with new profile picture.");
         }
     };
 
+    // Upload a note for the group
+    const uploadNote = async (req, res) => {
+        if (!req.file) {
+            return res.status(400).send("No file uploaded.");
+        }
+        try {
+            const noteData = {
+                url: req.file.path,
+                name: req.file.originalname,
+                groupId: req.params.groupId,
+                questionIds: []
+            };
+            const newNote = await dao.addNoteToGroup(req.params.groupId, noteData);
+            console.log("Note uploaded:", newNote);
+            res.json(newNote); // Send back the created note as JSON
+        } catch (err) {
+            console.error("Error uploading note:", err);
+            res.status(500).send("Failed to upload note and update group.");
+        }
+    };
 
     app.post("/api/groups", createGroup);
     app.get("/api/groups", findAllGroups);
@@ -106,5 +126,10 @@ export default function GroupRoutes(app) {
         "/api/groups/:groupId/uploadProfilePicture",
         upload.single("profilePicture"),
         uploadProfilePicture
+    );
+    app.post(
+        "/api/groups/:groupId/uploadNote",
+        upload.single("note"),
+        uploadNote
     );
 }
