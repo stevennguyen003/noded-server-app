@@ -1,5 +1,5 @@
 import model from "./model.js";
-import { createNote } from "../Notes/dao.js";
+import { addQuizToNote, createNote } from "../Notes/dao.js";
 export const createGroup = (group) => {
     delete group._id
     return model.create(group);
@@ -15,15 +15,24 @@ export const addNoteToGroup = async (groupId, noteData) => {
     try {
         // Create the note
         const newNote = await createNote(noteData);
+
+        // Generate quiz questions using the note's PDF URL
+        // const quizData = await generateQuestions(newNote.url);
+        
+        // Create the quiz and add it to the note
+        // const newQuiz = await addQuizToNote(newNote._id, quizData);
+
         // Add the note ID to the group's noteIds array
         await model.findByIdAndUpdate(
             groupId,
             { $push: { noteIds: newNote._id } },
             { new: true, runValidators: true }
         );
+
+        // return { note: newNote, quiz: newQuiz };
         return newNote;
     } catch (error) {
-        console.error("Error adding note to group:", error);
+        console.error("Error adding note to group and generating quiz:", error);
         throw error;
     }
 };

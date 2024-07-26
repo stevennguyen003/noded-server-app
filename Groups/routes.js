@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         cb(
             null,
-            `${req.params.userId}-${Date.now()}${path.extname(file.originalname)}`
+            `${req.params.groupId}-${Date.now()}${path.extname(file.originalname)}`
         );
     },
 });
@@ -104,7 +104,6 @@ export default function GroupRoutes(app) {
             const noteData = {
                 url: req.file.path,
                 name: req.file.originalname,
-                groupId: req.params.groupId,
                 questionIds: []
             };
             const newNote = await dao.addNoteToGroup(req.params.groupId, noteData);
@@ -132,4 +131,21 @@ export default function GroupRoutes(app) {
         upload.single("note"),
         uploadNote
     );
+    app.post("/api/notes/upload/:groupId", upload.single("pdf"), async (req, res) => {
+        try {
+            const groupId = req.params.groupId;
+            const noteData = {
+                name: req.file.originalname,
+                url: req.file.path
+            };
+            const pdfBuffer = fs.readFileSync(req.file.path);
+
+            const newNote = await dao.addNoteToGroup(groupId, noteData, pdfBuffer);
+
+            res.json(newNote);
+        } catch (error) {
+            console.error("Error uploading note and generating quiz:", error);
+            res.status(500).send("Error uploading note and generating quiz");
+        }
+    });
 }

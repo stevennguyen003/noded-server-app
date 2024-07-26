@@ -1,8 +1,8 @@
+import model from "./model.js";
+export const createQuiz = () => {
+    delete quiz._id
+    return model.create(quiz);
+}
 
-export const savePdfForUser = async (userId, pdfPath) => {
-    return await User.findByIdAndUpdate(
-        userId,
-        { $push: { pdfs: pdfPath } },
-        { new: true }
-    );
-};
+export const uploadPDF = (groupId, url) =>
+    model.updateOne({ _id: groupId }, { $set: { profilePicture: url } });
