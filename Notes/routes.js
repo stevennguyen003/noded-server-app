@@ -9,6 +9,26 @@ import { createWorker } from 'tesseract.js';
 // RESTful APIs
 export default function NoteRoutes(app) {
 
+    const parseClaudeResponse = (response) => {
+        const quizzes = [];
+        const questions = response.split('\n\n');
+        
+        questions.forEach((question, index) => {
+            const lines = question.split('\n');
+            const questionText = lines[0].replace(/^\d+\.\s*/, '');
+            const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
+            const correctAnswer = lines[lines.length - 1].replace('Correct answer: ', '');
+            
+            quizzes.push({
+                question: questionText,
+                options: options,
+                correctAnswer: correctAnswer
+            });
+        });
+        console.log("Parsing:", quizzes);
+        return quizzes;
+    };
+
     const extractPDFContent = async (pdfPath) => {
         const dataBuffer = fs.readFileSync(pdfPath);
         const data = await pdf(dataBuffer);
@@ -31,7 +51,7 @@ export default function NoteRoutes(app) {
         const anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
-
+    
         const response = await anthropic.messages.create({
             model: "claude-3-opus-20240229",
             max_tokens: 1000,
@@ -40,12 +60,20 @@ export default function NoteRoutes(app) {
             messages: [
                 {
                     role: "user",
-                    content: `Given the following content, generate 5 multiple-choice questions and give the correct answer as well:\n\n${content}`
+                    content: `Given the following content, generate 5 multiple-choice questions and give the correct answer as well. Format each question as follows:
+                    1. Question text
+                    a) Option 1
+                    b) Option 2
+                    c) Option 3
+                    d) Option 4
+                    Correct answer: [letter of correct option]
+    
+                    Repeat this format for all 5 questions.\n\n${content}`
                 }
             ]
         });
         return response.content[0].text;
-    }
+    };
 
     const processNotesAndGenerateQuestions = async (req, res) => {
         try {
@@ -60,14 +88,13 @@ export default function NoteRoutes(app) {
             // Extract content from the PDF
             const content = await extractPDFContent(pdfPath);
             // Generate questions using Claude
-            const questions = await generateQuestions(content);
-
-            // // Update the note document with the generated questions
-            // await dao.updateNoteQuizIds(noteId, questions);
-
+            const rawQuestions = await generateQuestions(content);
+            // Parse the response into quiz objects
+            const parsedQuizzes = parseClaudeResponse(rawQuestions);
+            // Update the note document with the generated questions
+            await dao.updateNoteWithQuiz(noteId, parsedQuizzes);
             // Send the generated questions as the API response
-            // res.json({ questions });
-            console.log(questions);
+            res.json({ quizzes: parsedQuizzes });
         } catch (error) {
             console.error("Error processing PDF and generating questions:", error);
             res.status(500).json({ error: "Internal server error" });

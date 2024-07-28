@@ -1,5 +1,5 @@
 import model from "./model.js";
-import { addQuizToNote, createNote } from "../Notes/dao.js";
+import { updateNoteWithQuiz, createNote } from "../Notes/dao.js";
 export const createGroup = (group) => {
     delete group._id
     return model.create(group);
