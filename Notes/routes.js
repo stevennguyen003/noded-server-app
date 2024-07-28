@@ -9,26 +9,7 @@ import { createWorker } from 'tesseract.js';
 // RESTful APIs
 export default function NoteRoutes(app) {
 
-    const parseClaudeResponse = (response) => {
-        const quizzes = [];
-        const questions = response.split('\n\n');
-        
-        questions.forEach((question, index) => {
-            const lines = question.split('\n');
-            const questionText = lines[0].replace(/^\d+\.\s*/, '');
-            const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
-            const correctAnswer = lines[lines.length - 1].replace('Correct answer: ', '');
-            
-            quizzes.push({
-                question: questionText,
-                options: options,
-                correctAnswer: correctAnswer
-            });
-        });
-        console.log("Parsing:", quizzes);
-        return quizzes;
-    };
-
+    // Given path to a PDF file, extract content
     const extractPDFContent = async (pdfPath) => {
         const dataBuffer = fs.readFileSync(pdfPath);
         const data = await pdf(dataBuffer);
@@ -47,11 +28,11 @@ export default function NoteRoutes(app) {
         }
     }
 
+    // Given content, use Claude AI to generate questions with the given prompt and format
     const generateQuestions = async (content) => {
         const anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
-    
         const response = await anthropic.messages.create({
             model: "claude-3-opus-20240229",
             max_tokens: 1000,
@@ -75,6 +56,28 @@ export default function NoteRoutes(app) {
         return response.content[0].text;
     };
 
+    // Parse the response from Claude into quiz objects for the database
+    const parseClaudeResponse = (response) => {
+        const quizzes = [];
+        const questions = response.split('\n\n');
+        
+        questions.forEach((question, index) => {
+            const lines = question.split('\n');
+            const questionText = lines[0].replace(/^\d+\.\s*/, '');
+            const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
+            const correctAnswer = lines[lines.length - 1].replace('Correct answer: ', '');
+            
+            quizzes.push({
+                question: questionText,
+                options: options,
+                correctAnswer: correctAnswer
+            });
+        });
+        console.log("Parsing:", quizzes);
+        return quizzes;
+    };
+
+    // Overarching function for api call, fetches url frrom noteId and generate questions
     const processNotesAndGenerateQuestions = async (req, res) => {
         try {
             const noteId = req.params.noteId;
