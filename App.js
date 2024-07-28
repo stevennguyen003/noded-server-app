@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import Hello from "./Hello.js";
 import UserRoutes from "./Users/routes.js";
 import GroupRoutes from "./Groups/routes.js";
+import QuizRoutes from "./Quizzes/routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +46,7 @@ app.use(session(sessionOptions));
 app.use(express.json());
 GroupRoutes(app);
 UserRoutes(app);
+QuizRoutes(app);
 Hello(app);
 
 app.listen(process.env.PORT || 4000);

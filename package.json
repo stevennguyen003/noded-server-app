@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/stevennguyen003/x-node-server-app#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -26,7 +27,6 @@
     "fs": "^0.0.1-security",
     "mongoose": "^8.4.5",
     "multer": "^1.4.5-lts.1",
-    "path": "^0.12.7",
-    "pdf-parse": "^1.1.1"
+    "path": "^0.12.7"
   }
 }
