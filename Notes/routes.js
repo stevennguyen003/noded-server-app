@@ -60,13 +60,13 @@ export default function NoteRoutes(app) {
     const parseClaudeResponse = (response) => {
         const quizzes = [];
         const questions = response.split('\n\n');
-        
+
         questions.forEach((question, index) => {
             const lines = question.split('\n');
             const questionText = lines[0].replace(/^\d+\.\s*/, '');
             const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
             const correctAnswer = lines[lines.length - 1].replace('Correct answer: ', '');
-            
+
             quizzes.push({
                 question: questionText,
                 options: options,
@@ -104,5 +104,17 @@ export default function NoteRoutes(app) {
         }
     };
 
+    // Fetch all quizzes corresponding to a note
+    const findAllQuizzes = async (req, res) => {
+        try {
+            const quizzes = await dao.getAllQuizzes(req.params.noteId);
+            res.json(quizzes);
+        } catch (error) {
+            console.error('Error fetching quizzes:', error);
+            res.status(500).json({ error: 'An error occurred while fetching quizzes.' });
+        }
+    }
+
     app.get("/api/notes/:noteId/generate", processNotesAndGenerateQuestions);
+    app.get("/api/notes/:noteId/findAllQuizzes", findAllQuizzes);
 }

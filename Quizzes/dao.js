@@ -1,8 +1,9 @@
 import model from "./model.js";
-export const createQuiz = () => {
-    delete quiz._id
-    return model.create(quiz);
-}
 
-export const uploadPDF = (groupId, url) =>
-    model.updateOne({ _id: groupId }, { $set: { profilePicture: url } });
+// Create a quiz
+export const createQuiz = (quiz) => {
+    delete quiz._id;
+    return model.create(quiz);
+};
+// Find a quiz given its ID
+export const findQuizById = (quizId) => model.findById(quizId);

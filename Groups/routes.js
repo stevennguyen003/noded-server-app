@@ -115,6 +115,17 @@ export default function GroupRoutes(app) {
         }
     };
 
+    // Fetch all notes corresponding to a group
+    const findAllNotes = async (req, res) => {
+        try {
+            const notes = await dao.getAllNotes(req.params.groupId);
+            res.json(notes);
+        } catch (error) {
+            console.error('Error fetching notes:', error);
+            res.status(500).json({ error: 'An error occurred while fetching notes.' });
+        }
+    }
+
     app.post("/api/groups", createGroup);
     app.get("/api/groups", findAllGroups);
     app.get("/api/groups/id/:groupId", findGroupById);
@@ -148,4 +159,5 @@ export default function GroupRoutes(app) {
             res.status(500).send("Error uploading note and generating quiz");
         }
     });
+    app.get("/api/groups/:groupId/findAllNotes", findAllNotes);
 }
