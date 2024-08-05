@@ -33,6 +33,7 @@ export default function NoteRoutes(app) {
         const anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
+        const timestamp = Date.now();
         const response = await anthropic.messages.create({
             model: "claude-3-opus-20240229",
             max_tokens: 1000,
@@ -41,7 +42,7 @@ export default function NoteRoutes(app) {
             messages: [
                 {
                     role: "user",
-                    content: `Given the following content, generate 5 multiple-choice questions and give the correct answer as well. Format each question as follows:
+                    content: `Given the following content, generate 5 unique multiple-choice questions as of timestamp ${timestamp}. Format each question as follows:
                     1. Question text
                     a) Option 1
                     b) Option 2
@@ -59,7 +60,7 @@ export default function NoteRoutes(app) {
     // Parse the response from Claude into quiz objects for the database
     const parseClaudeResponse = (response) => {
         const quizzes = [];
-        const questions = response.split('\n\n');
+        const questions = response.split('\n\n').slice(1);
 
         questions.forEach((question, index) => {
             const lines = question.split('\n');

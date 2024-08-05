@@ -19,8 +19,8 @@ export const updateNote = (noteId, note) => model.updateOne({ _id: noteId }, { $
 export const deleteNote = (noteId) => model.deleteOne({ _id: noteId });
 // Given an array of quizzes, save them into the database and store their ID's with the note's array
 export const updateNoteWithQuiz = async (noteId, quizzes) => {
-    console.log("Hit Update");
-    const quizIds = [];
+    const note = await model.findById(noteId);
+    const quizIds = note.quizIds;
     for (const quiz of quizzes) {
         const newQuiz = new Quiz(quiz);
         await newQuiz.save();
