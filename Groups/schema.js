@@ -9,7 +9,7 @@ function generateInviteCode() {
 // Represents how the group collection is structured in the database
 const groupSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    users: {
+    userRoles: {
         type: Map,
         of: {
             type: String,
@@ -17,8 +17,8 @@ const groupSchema = new mongoose.Schema({
             default: 'user'
         }
     },
-    inviteCode: { 
-        type: String, 
+    inviteCode: {
+        type: String,
         default: generateInviteCode,
         unique: true,
         required: true
@@ -28,7 +28,7 @@ const groupSchema = new mongoose.Schema({
 }, { collection: "groups" });
 
 // Middleware to ensure uniqueness of invite link
-groupSchema.pre('save', async function(next) {
+groupSchema.pre('save', async function (next) {
     if (this.isNew) {
         const Group = mongoose.model('Group', groupSchema);
         let isUnique = false;
