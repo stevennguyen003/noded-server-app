@@ -13,14 +13,14 @@ import NoteRoutes from "./Notes/routes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CONNECTION_STRING = process.env.DB_CONNECTION_STRING || "mongodb://127.0.0.1:27017/project-x-db";
+const CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
 mongoose.connect(CONNECTION_STRING);
 
 const app = express();
 
 app.use(cors({
     credentials: true,
-    origin: "http://localhost:3000"
+    origin: [process.env.HTTP_SERVER_DOMAIN, "http://localhost:3000"]
 }));
 
 const sessionOptions = {
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== "development") {
     sessionOptions.cookie = {
         sameSite: "none",
         secure: true,
-        domain: "http://localhost:4000",
+        domain: process.env.HTTP_SERVER_DOMAIN,
     };
 }
 
