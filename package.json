@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node App.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "multer": "^1.4.5-lts.1",
     "path": "^0.12.7",
     "pdf-parse": "^1.1.1",
-    "tesseract.js": "^5.1.0"
+    "tesseract.js": "^5.1.0",
+    "x-node-server-app": "file:"
   }
 }
