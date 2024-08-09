@@ -20,7 +20,7 @@ const app = express();
 
 app.use(cors({
     credentials: true,
-    origin: [process.env.FRONTEND_URL, "http://localhost:3000"]
+    origin: ["https://noded.netlify.app", "http://localhost:3000"]
 }));
 
 const sessionOptions = {
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== "development") {
     sessionOptions.cookie = {
         sameSite: "none",
         secure: true,
-        domain: process.env.HTTP_SERVER_DOMAIN,
+        domain: "https://noded-server-app.onrender.com"
     };
 }
 
