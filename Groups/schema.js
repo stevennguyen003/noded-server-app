@@ -17,6 +17,10 @@ const groupSchema = new mongoose.Schema({
             default: 'user'
         }
     },
+    userScores: {
+        type: Map,
+        of: Number
+    },
     inviteCode: {
         type: String,
         default: generateInviteCode,
