@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== "development") {
     sessionOptions.cookie = {
         sameSite: "none",
         secure: true,
-        domain: "https://noded-server-app.onrender.com"
+        // domain: "https://noded-server-app.onrender.com"
     };
 }
 
