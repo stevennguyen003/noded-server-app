@@ -62,6 +62,17 @@ export default function GroupRoutes(app) {
             if (!group) {
                 return res.status(404).json({ error: 'Group not found' });
             }
+            // Make sure user scores is sorted descending.
+            if (group.userScores) {
+                console.log("Original userScores:", group.userScores);
+                // Convert to array, sort, and convert back to object
+                const sortedEntries = [...group.userScores.entries()].sort((a, b) => b[1] - a[1]);
+                const sortedScores = Object.fromEntries(sortedEntries);
+                console.log("Sorted userScores:", sortedScores);
+                group.userScores = sortedScores;
+                // Save the updated group back to the database
+                await dao.updateGroup(groupId, { userScores: sortedScores });
+            }
             res.json(group);
         } catch (error) {
             console.error('Error finding group:', error);
