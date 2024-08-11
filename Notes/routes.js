@@ -9,6 +9,12 @@ import { createWorker } from 'tesseract.js';
 // RESTful APIs
 export default function NoteRoutes(app) {
 
+    // Find a note by its unique id
+    const findNoteById = async (req, res) => {
+        const note = await dao.findNoteById(req.params.noteId);
+        res.json(note);
+    };
+
     // Given path to a PDF file, extract content
     const extractPDFContent = async (pdfPath) => {
         const dataBuffer = fs.readFileSync(pdfPath);
@@ -116,6 +122,7 @@ export default function NoteRoutes(app) {
         }
     }
 
+    app.get("/api/notes/:noteId", findNoteById);
     app.get("/api/notes/:noteId/generate", processNotesAndGenerateQuestions);
     app.get("/api/notes/:noteId/findAllQuizzes", findAllQuizzes);
 }

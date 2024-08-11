@@ -64,11 +64,9 @@ export default function GroupRoutes(app) {
             }
             // Make sure user scores is sorted descending.
             if (group.userScores) {
-                console.log("Original userScores:", group.userScores);
                 // Convert to array, sort, and convert back to object
                 const sortedEntries = [...group.userScores.entries()].sort((a, b) => b[1] - a[1]);
                 const sortedScores = Object.fromEntries(sortedEntries);
-                console.log("Sorted userScores:", sortedScores);
                 group.userScores = sortedScores;
                 // Save the updated group back to the database
                 await dao.updateGroup(groupId, { userScores: sortedScores });
@@ -112,6 +110,7 @@ export default function GroupRoutes(app) {
             return res.status(400).send("No file uploaded.");
         }
         try {
+
             const noteData = {
                 url: req.file.path,
                 name: req.file.originalname,
