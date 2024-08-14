@@ -21,6 +21,10 @@ const groupSchema = new mongoose.Schema({
         type: Map,
         of: Number
     },
+    userProgress: {
+        type: Map,
+        of: Number
+    },
     inviteCode: {
         type: String,
         default: generateInviteCode,
