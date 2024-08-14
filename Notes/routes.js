@@ -71,7 +71,13 @@ export default function NoteRoutes(app) {
         questions.forEach((question, index) => {
             const lines = question.split('\n');
             const questionText = lines[0].replace(/^\d+\.\s*/, '');
-            const options = lines.slice(1, -1).map(line => line.replace(/^[a-d]\)\s*/, ''));
+
+            const options = new Map();
+            lines.slice(1, -1).forEach(line => {
+                const [key, value] = line.split(') ');
+                options.set(key, value.trim());
+            });
+
             const correctAnswer = lines[lines.length - 1].replace('Correct answer: ', '');
 
             quizzes.push({
