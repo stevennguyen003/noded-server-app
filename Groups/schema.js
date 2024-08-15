@@ -25,6 +25,14 @@ const groupSchema = new mongoose.Schema({
         type: Map,
         of: Number
     },
+    userStreak: {
+        type: Map,
+        of: Number
+    },
+    lastResetDate: {
+        type: Date,
+        default: Date.now
+    },
     inviteCode: {
         type: String,
         default: generateInviteCode,
@@ -53,3 +61,20 @@ groupSchema.pre('save', async function (next) {
 });
 
 export default groupSchema;
+
+// Static method to reset all group's quiz progress when a new day starts
+groupSchema.statics.resetAllProgress = async function () {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const result = await this.updateMany(
+        { lastResetDate: { $lt: today } },
+        {
+            $set: {
+                userProgress: {},
+                lastResetDate: today
+            }
+        }
+    );
+    return result;
+};

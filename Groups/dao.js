@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 import model from "./model.js";
+import schedule from 'node-schedule';
 import { createNote } from "../Notes/dao.js";
 import noteSchema from "../Notes/schema.js";
+import groupSchema from "./schema.js";
 
 const Note = mongoose.model('Note', noteSchema);
+const Group = mongoose.model('Group', groupSchema);
 
 // Create a new group
 export const createGroup = (group) => {
@@ -58,3 +61,12 @@ export const getAllNotes = async (groupId) => {
         throw error;
     }
 };
+// Function to execute daily group reset
+const dailyReset = schedule.scheduleJob('0 0 * * *', async function () {
+    try {
+        const result = await Group.resetAllProgress();
+        console.log(`Reset progress for ${result.modifiedCount} groups`);
+    } catch (error) {
+        console.error('Error resetting progress:', error);
+    }
+});

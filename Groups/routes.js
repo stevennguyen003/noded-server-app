@@ -31,7 +31,7 @@ const upload = multer({ storage: storage });
 // RESTful APIs
 export default function GroupRoutes(app) {
 
-    // Creates a user for the session
+    // Creates a group
     const createGroup = async (req, res) => {
         const group = await dao.createGroup(req.body);
         // Fetches any updates in user information
