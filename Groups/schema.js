@@ -29,6 +29,16 @@ const groupSchema = new mongoose.Schema({
         type: Map,
         of: Number
     },
+    userWeeklyProgress: {
+        type: Map,
+        of: {
+            Mon: { type: Boolean, default: false },
+            Tue: { type: Boolean, default: false },
+            Wed: { type: Boolean, default: false },
+            Thu: { type: Boolean, default: false },
+            Fri: { type: Boolean, default: false }
+        }
+    },
     lastResetDate: {
         type: Date,
         default: Date.now
