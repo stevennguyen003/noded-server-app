@@ -72,19 +72,39 @@ groupSchema.pre('save', async function (next) {
 
 export default groupSchema;
 
-// Static method to reset all group's quiz progress when a new day starts
-groupSchema.statics.resetAllProgress = async function () {
+// Function to execute daily group reset
+groupSchema.statics.resetAllProgressAndGenerateQuestions = async function () {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const result = await this.updateMany(
-        { lastResetDate: { $lt: today } },
-        {
-            $set: {
-                userProgress: {},
-                lastResetDate: today
-            }
-        }
-    );
-    return result;
+    const groups = await this.find({ lastResetDate: { $lt: today } });
+
+    for (const group of groups) {
+        // Reset progress
+        group.userProgress = {};
+        group.lastResetDate = today;
+        // Generate new questions (you'll need to implement this function)
+        group.dailyQuestions = await generateQuestionsForGroup(group);
+        group.lastQuestionsGeneratedDate = today;
+        await group.save();
+    }
+
+    return groups.length;
 };
+
+// Generate new questions each day
+async function generateQuestionsForGroup(group) {
+    const allQuestions = [];
+    // Iterate through each noteId in the group
+    for (const noteId of group.noteIds) {
+        try {
+            // Make an HTTP request to the processNotesAndGenerateQuestions endpoint
+            const response = await axios.get(`http://localhost:3000/api/notes/${noteId}/generate`);
+            // Add the generated quizzes to the allQuestions array
+            allQuestions.push(...response.data.quizzes);
+        } catch (error) {
+            console.error(`Error generating questions for noteId ${noteId}:`, error);
+        }
+    }
+    return allQuestions;
+}

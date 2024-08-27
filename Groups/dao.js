@@ -61,12 +61,27 @@ export const getAllNotes = async (groupId) => {
         throw error;
     }
 };
-// Function to execute daily group reset
+
+// Modified function to execute daily group reset and question generation
 const dailyReset = schedule.scheduleJob('0 0 * * *', async function () {
     try {
-        const result = await Group.resetAllProgress();
-        console.log(`Reset progress for ${result.modifiedCount} groups`);
+        const result = await Group.resetAllProgressAndGenerateQuestions();
+        console.log(`Reset progress and generated new questions for ${result} groups`);
     } catch (error) {
-        console.error('Error resetting progress:', error);
+        console.error('Error resetting progress and generating questions:', error);
     }
 });
+
+// New function to get daily questions for a group
+export const getDailyQuestions = async (groupId) => {
+    try {
+        const group = await model.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        return group.dailyQuestions;
+    } catch (error) {
+        console.error('Error fetching daily questions:', error);
+        throw error;
+    }
+};

@@ -110,7 +110,6 @@ export default function GroupRoutes(app) {
             return res.status(400).send("No file uploaded.");
         }
         try {
-
             const noteData = {
                 url: req.file.path,
                 name: req.file.originalname,
